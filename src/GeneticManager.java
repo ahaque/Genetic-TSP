@@ -8,7 +8,7 @@ public class GeneticManager {
 	public static final String INPUT_FILE = "input1.txt";
 	public static final int POPULATION_SIZE = 10;
 	
-	public int[][] matrix;
+	public static int[][] matrix;
 	public static int numCities;
 	
 	public static void main(String[] args) {

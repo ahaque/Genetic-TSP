@@ -28,6 +28,15 @@ public class Individual {
 			tour.add(nextPossibleCity.get(index));
 			nextPossibleCity.remove(index);
 		}
+		calculateCost();
+	}
+	
+	public void calculateCost() {
+		int start = tour.get(0);
+		for (int i = 0; i < tour.size()-1; i++) {
+			cost += GeneticManager.matrix[i][i+1];
+		}
+		cost += GeneticManager.matrix[tour.get(tour.size()-1)][start];
 	}
 	
 	public void addCityToTour(int city) {
@@ -48,7 +57,7 @@ public class Individual {
 
 	public String toString() {
 		StringBuilder build = new StringBuilder();
-		build.append("Individual: ");
+		build.append("Individual (" + cost + "): ");
 		for (int i : tour) {
 			build.append(i + " ");
 		}
