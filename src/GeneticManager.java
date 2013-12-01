@@ -1,15 +1,20 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 
 public class GeneticManager {
 	
+	// The input file is a SPACE delimited distance matrix
+	// For this implementation, the triangle inequality does not need to be satisfied
 	public static final String INPUT_FILE = "input1.txt";
 	public static final int POPULATION_SIZE = 10;
 	
+	// Input data
 	public static int[][] matrix;
 	public static int numCities;
+	
+	// Genetic Algorithm Paramaters
+	public static boolean keepBestFit = true; // The best individual will always survive to the next population
 	
 	public static void main(String[] args) {
 		GeneticManager gm = new GeneticManager();
@@ -20,6 +25,8 @@ public class GeneticManager {
 		}
 		Population pop = new Population(numCities);
 		pop.initializePopulationRandomly(POPULATION_SIZE);
+		System.out.println(pop.getBestIndividual());
+		
 	}
 		
 	public GeneticManager() {
