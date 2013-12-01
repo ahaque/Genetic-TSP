@@ -32,9 +32,12 @@ public class Population {
 	 * Step 2: Create offspring given two parents (genetic crossover)
 	 * Step 3: Add mutations to some of the new children (mutation)
 	 */
+	
+	ArrayList<Individual> sorted;
+	
 	public Population evolve() {
 		// STEP 1: Select the best fit (elitism)
-		ArrayList<Individual> sorted = new ArrayList<Individual>();
+		sorted = new ArrayList<Individual>();
 		Population nextGenPop = new Population(numCities);
 		int populationSpaceAvailable = individuals.size();
 		
@@ -53,25 +56,24 @@ public class Population {
 		// Add "top" individuals to the next generation
 		int numElite = (int) (GeneticManager.POPULATION_SIZE * GeneticManager.ELITE_PERCENT);
 		for (int i = 0; i < numElite; i++) {
-			nextGenPop.individuals.add(sorted.get(i));
+			if (Math.random() < GeneticManager.MUTATION_RATE) {
+				nextGenPop.individuals.add(mutate(sorted.get(i)));;
+			} else {
+				nextGenPop.individuals.add(sorted.get(i));
+			}
 			populationSpaceAvailable--;
 		}
 		
 		// STEP 2: Select 2 parents from population and generate children
 		while (populationSpaceAvailable > 0) {
 			// STEP 2: Create offspring given two parents (genetic crossover)
-			Individual p1 = selectParentViaTournament(sorted);
-			Individual p2 = selectParentViaTournament(sorted);
+			Individual p1 = selectParentViaTournament();
+			Individual p2 = selectParentViaTournament();
 			Individual child = crossover(p1, p2);
 			
 			// STEP 3: Add mutations
 			if (Math.random() < GeneticManager.MUTATION_RATE) {
-				int index1 = (int)(Math.random()*numCities);
-				int index2 = (int)(Math.random()*numCities);
-				int storage = child.getCity(index1);
-				//System.out.println("MUTATION: Swapping t["+index1+"]:"+storage+" with t["+index2+"]:"+child.tour.get(index2));
-				child.tour.set(index1, child.tour.get(index2));
-				child.tour.set(index2, storage);
+				mutate(child);
 			}
 			
 			child.calculateCost();
@@ -82,6 +84,16 @@ public class Population {
 			}
 		}
 		return nextGenPop;
+	}
+	
+	public Individual mutate(Individual ind) {
+		int index1 = (int)(Math.random()*numCities);
+		int index2 = (int)(Math.random()*numCities);
+		int storage = ind.getCity(index1);
+		//System.out.println("MUTATION: Swapping t["+index1+"]:"+storage+" with t["+index2+"]:"+ind.tour.get(index2));
+		ind.tour.set(index1, ind.tour.get(index2));
+		ind.tour.set(index2, storage);
+		return ind;
 	}
 	
 	public double averageFitness() {
@@ -122,7 +134,7 @@ public class Population {
 		return child;
 	}
 
-	public Individual selectParentViaTournament(ArrayList<Individual> sorted) {
+	public Individual selectParentViaTournament() {
 		Random rand = new Random();
 		// Select individuals randomly from the population
 		// WITH a bias towards selecting high fitness individuals
@@ -142,7 +154,10 @@ public class Population {
 	}
 	
 	public Individual getBestIndividualInPop() {
-		return getBestIndividual(individuals);
+		if (sorted != null) {
+			return sorted.get(0);
+		}
+		return getBestIndividual(this.individuals);
 	}
 	
 	public Individual getBestIndividual(ArrayList<Individual> pop) {
