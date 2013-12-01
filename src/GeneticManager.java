@@ -14,6 +14,7 @@ public class GeneticManager {
 		} catch (IOException e) {
 			System.err.println(e);
 		}
+		gm.printMatrix();
 	}
 		
 	public GeneticManager() {
@@ -34,9 +35,24 @@ public class GeneticManager {
 		// Reset reader to the start of the file
 		br = new BufferedReader(new FileReader(INPUT_FILE));
 		// Populate the distance matrix
+		int currentCity = 0;
+		build = new StringBuilder();
 		while (!build.append(br.readLine()).toString().equalsIgnoreCase("null")) {
-			
+			String[] tokens = build.toString().split(" ");
+			for (int i = 0; i < numCities; i++) {
+				matrix[currentCity][i] = Integer.parseInt(tokens[i]);
+			}
+			currentCity++;
 			build.setLength(0); // Clears the buffer
+		}
+	}
+	
+	public void printMatrix() {
+		for (int i = 0; i < matrix.length; i++) {
+			for (int j = 0; j < matrix[i].length; j++) {
+				System.out.print(matrix[i][j] + " ");
+			}
+			System.out.println();
 		}
 	}
 }
