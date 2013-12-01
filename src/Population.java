@@ -53,13 +53,18 @@ public class Population {
 			sorted.add(individuals.get(bestIndex));
 			individuals.remove(bestIndex);
 		}
+		// Keep the best individual
+		nextGenPop.individuals.add(sorted.get(0));
+		--populationSpaceAvailable;
 		// Add "top" individuals to the next generation
 		int numElite = (int) (GeneticManager.POPULATION_SIZE * GeneticManager.ELITE_PERCENT);
 		for (int i = 0; i < numElite; i++) {
 			if (Math.random() < GeneticManager.MUTATION_RATE) {
 				nextGenPop.individuals.add(mutate(sorted.get(i)));;
+				nextGenPop.individuals.get(nextGenPop.individuals.size()-1).calculateCost();
 			} else {
 				nextGenPop.individuals.add(sorted.get(i));
+				nextGenPop.individuals.get(nextGenPop.individuals.size()-1).calculateCost();
 			}
 			populationSpaceAvailable--;
 		}
