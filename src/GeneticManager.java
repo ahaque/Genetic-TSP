@@ -6,7 +6,7 @@ public class GeneticManager {
 	
 	// The input file is a SPACE delimited distance matrix
 	// For this implementation, the triangle inequality does not need to be satisfied
-	public static final String INPUT_FILE = "input1.txt";
+	public static final String INPUT_FILE = "input5.txt";
 	
 	// Input data
 	public static int[][] matrix;
@@ -16,7 +16,7 @@ public class GeneticManager {
 	public static boolean printNewChildren = false;
 	
 	// Genetic Algorithm Paramaters
-	public static final int POPULATION_SIZE = 1000;
+	public static final int POPULATION_SIZE = 200;
 	public static final int NUM_EVOLUTION_ITERATIONS = 10000;
 
 	// When selecting two parents, we want the "fittest" parents to reproduce
@@ -25,14 +25,15 @@ public class GeneticManager {
 	// This must be less than POPULATION_SIZE
 	public static int TOURNAMENT_SIZE = 10; 
 	// The probability a specific individual undergoes a single mutation
-	public static double MUTATION_RATE = 0.1;
+	public static double MUTATION_RATE = 0.75;
 	// Probability of skipping crossover and using the best parent
-	public static double CLONE_RATE = 0.1;
+	public static double CLONE_RATE = 0.00;
 	// Elite percent is what we define as "high" fit individuals
 	public static double ELITE_PERCENT = 0.1;
 	// When selecting parents, the ELITE_PARENT_RATE is the probability that we select an elite parent
-	public static double ELITE_PARENT_RATE = 0.4;
+	public static double ELITE_PARENT_RATE = 0.3;
 	
+	public static int GA_VERSION = 1;
 	
 	public static void main(String[] args) {
 		checkParameterErrors();
@@ -42,18 +43,33 @@ public class GeneticManager {
 		} catch (IOException e) {
 			System.err.println(e);
 		}
-		Population pop = new Population(numCities);
-		pop.initializePopulationRandomly(POPULATION_SIZE);
-		for (int i = 0; i < NUM_EVOLUTION_ITERATIONS; i++) {
-			//System.out.println("ITERATION " + i + ". AVERAGE FITNESS: " + pop.averageFitness());
-			pop = pop.evolve();
-			if (i % 1000 == 0) {
-				System.out.println("Finished Iteration: " + i + ". Best Solution: "+pop.getBestIndividualInPop());
+		long startTime = System.nanoTime();
+		if (GA_VERSION == 1) {
+			Population pop = new Population(numCities);
+			pop.initializePopulationRandomly(POPULATION_SIZE);
+			System.out.println(pop);
+
+			for (int i = 0; i < NUM_EVOLUTION_ITERATIONS; i++) {
+				//System.out.println("ITERATION " + i + ". AVERAGE FITNESS: " + pop.averageFitness());
+				pop = pop.evolve();
+				if (i % 1000 == 0) {
+					System.out.println("Finished Iteration: " + i + ". Best Solution: "+pop.getBestIndividualInPop());
+				}
 			}
-			//System.out.println(pop);
+			System.out.println("BEST SOLUTION:");
+			System.out.println(pop.getBestIndividualInPop());
+			System.out.println(pop);
 		}
-		System.out.println("BEST SOLUTION:");
-		System.out.println(pop.getBestIndividualInPop());
+		else if (GA_VERSION == 2) {
+			// Version Two: Generate iterations*population size individuals randomly. Select best fit
+			Population pop2 = new Population(numCities);
+			pop2.initializePopulationRandomly(POPULATION_SIZE*NUM_EVOLUTION_ITERATIONS);
+			System.out.println(pop2);
+			System.out.println("BEST SOLUTION:");
+			System.out.println(pop2.getBestIndividualInPop());
+		}
+		long endTime = System.nanoTime();
+		System.out.println("RUNNING TIME: "+ (endTime-startTime));
 	}
 		
 	public GeneticManager() {
