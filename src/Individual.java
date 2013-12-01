@@ -8,7 +8,7 @@ import java.util.Random;
  */
 public class Individual {
 	
-	private ArrayList<Integer> tour; // Stores the list of city paths
+	public ArrayList<Integer> tour; // Stores the list of city paths
 	private int cost; // The cost of the tour
 	
 	public Individual() {

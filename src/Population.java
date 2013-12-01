@@ -31,24 +31,104 @@ public class Population {
 	 * Step 2: Create offspring given two parents (genetic crossover)
 	 * Step 3: Add mutations to some of the new children (mutation)
 	 */
-	public void evolve() {
+	public Population evolve() {
+		// STEP 1: Select the best fit (elitism)
+		Population nextGenPop = new Population(numCities);
 		int populationSpaceAvailable = individuals.size();
-		ArrayList<Individual> nextGeneration = new ArrayList<Individual>();
 		if (GeneticManager.keepBestFit == true) {
-			nextGeneration.add(getBestIndividual());
-			populationSpaceAvailable--;
+			nextGenPop.individuals.add(getBestIndividual(individuals));
+			populationSpaceAvailable -= 5;
 		}
-	}
-	
-	public Individual getBestIndividual() {
-		int minCost = Integer.MAX_VALUE;
-		int minIndex = -1;
-		for (int i = 0; i < individuals.size(); i++) {
-			if (individuals.get(i).getCost() < minCost) {
-				minIndex = i;
-				minCost = individuals.get(i).getCost();
+		
+		while (populationSpaceAvailable > 0) {
+			// STEP 2: Create offspring given two parents (genetic crossover)
+			Individual p1 = selectParentViaTournament();
+			Individual p2 = selectParentViaTournament();
+			Individual child = crossover(p1, p2);
+			
+			// STEP 3: Add mutations
+			if (Math.random() < GeneticManager.MUTATION_RATE) {
+				
+				int index1 = (int)(Math.random()*numCities);
+				int index2 = (int)(Math.random()*numCities);
+				int storage = child.getCity(index1);
+				//System.out.println("MUTATION: Swapping t["+index1+"]:"+storage+" with t["+index2+"]:"+child.tour.get(index2));
+				child.tour.set(index1, child.tour.get(index2));
+				child.tour.set(index2, storage);
+			}
+			
+			child.calculateCost();
+			nextGenPop.individuals.add(child);
+			populationSpaceAvailable--;
+			if (GeneticManager.printNewChildren == true) {
+				System.out.println(child);
 			}
 		}
-		return individuals.get(minIndex);
+		return nextGenPop;
+	}
+	
+	public double averageFitness() {
+		long sum = 0L;
+		for (Individual ind : individuals) {
+			sum += ind.getCost();
+		}
+		return (double) (sum/GeneticManager.POPULATION_SIZE);
+	}
+	
+	public Individual crossover(Individual p1, Individual p2) {
+		Individual child = new Individual();
+		// Generate a subtour from parent 1
+		int index1 = (int)(Math.random()*numCities);
+		int index2 = (int)(Math.random()*numCities);
+		int start = Math.min(index1, index2);
+		int end = Math.max(index1, index2);
+		// Add the subtour from parent 1
+		for (int i = start; i < end; i++) {
+			child.addCityToTour(p1.getCity(i));
+		}
+		// Add the remaining cities from parent 2
+		for (int j = 0; j < numCities; j++) {
+			if (!child.tour.contains(p2.getCity(j))) {
+				child.addCityToTour(p2.getCity(j));
+			}
+		}
+		// Small chance of cloning the better parent
+		if (Math.random() < GeneticManager.CLONE_RATE) {
+			if (p1.getCost() < p2.getCost()) {
+				return p1;
+			}
+			else {
+				return p2;
+			}
+		}
+		
+		return child;
+	}
+	
+	public Individual selectParentViaTournament() {
+		ArrayList<Individual> tournamentPopulation = new ArrayList<Individual>();
+		// Select individuals randomly from the population
+		for (int i = 0; i < GeneticManager.TOURNAMENT_SIZE; i++) {
+			int randIndex = (int) (Math.random()*individuals.size());
+			tournamentPopulation.add(individuals.get(randIndex));
+		}
+		//System.out.println("BEST: "+getBestIndividual(tournamentPopulation));
+		return getBestIndividual(tournamentPopulation);
+	}
+	
+	public Individual getBestIndividualInPop() {
+		return getBestIndividual(individuals);
+	}
+	
+	public Individual getBestIndividual(ArrayList<Individual> pop) {
+		int minCost = Integer.MAX_VALUE;
+		int minIndex = -1;
+		for (int i = 0; i < pop.size(); i++) {
+			if (pop.get(i).getCost() < minCost) {
+				minIndex = i;
+				minCost = pop.get(i).getCost();
+			}
+		}
+		return pop.get(minIndex);
 	}
 }

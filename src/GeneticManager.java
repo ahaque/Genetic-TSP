@@ -7,16 +7,32 @@ public class GeneticManager {
 	// The input file is a SPACE delimited distance matrix
 	// For this implementation, the triangle inequality does not need to be satisfied
 	public static final String INPUT_FILE = "input1.txt";
-	public static final int POPULATION_SIZE = 10;
 	
 	// Input data
 	public static int[][] matrix;
 	public static int numCities;
 	
+	// Debugging
+	public static boolean printNewChildren = false;
+	
 	// Genetic Algorithm Paramaters
-	public static boolean keepBestFit = true; // The best individual will always survive to the next population
+	public static final int POPULATION_SIZE = 200;
+	public static final int NUM_EVOLUTION_ITERATIONS = 1000;
+	// The best individual will always survive to the next population
+	public static boolean keepBestFit = true;
+	// When selecting two parents, we want the "fittest" parents to reproduce
+	// This is done by randomly selecting X individuals in the population and 
+	// selecting the top two from this sub-population. The size of the sub-population is tournament size
+	// This must be less than POPULATION_SIZE
+	public static int TOURNAMENT_SIZE = 10; 
+	// The probability a specific individual undergoes a single mutation
+	public static double MUTATION_RATE = 0.05;
+	// Probability of skippnig crossover and using the best parent
+	public static double CLONE_RATE = 0.0;
+	
 	
 	public static void main(String[] args) {
+		checkParameterErrors();
 		GeneticManager gm = new GeneticManager();
 		try {
 			gm.readDistanceMatrix();
@@ -25,7 +41,10 @@ public class GeneticManager {
 		}
 		Population pop = new Population(numCities);
 		pop.initializePopulationRandomly(POPULATION_SIZE);
-		System.out.println(pop.getBestIndividual());
+		for (int i = 0; i < NUM_EVOLUTION_ITERATIONS; i++) {
+			System.out.println("ITERATION " + i + ". AVERAGE FITNESS: " + pop.averageFitness());
+			pop = pop.evolve();
+		}
 		
 	}
 		
@@ -69,6 +88,25 @@ public class GeneticManager {
 				System.out.print(matrix[i][j] + " ");
 			}
 			System.out.println();
+		}
+	}
+	
+	public static void checkParameterErrors() {
+		boolean error = false;
+		if (POPULATION_SIZE < TOURNAMENT_SIZE) {
+			System.err.println("ERROR: Tournament size must be less than population size.");
+			error = true;
+		}
+		if (POPULATION_SIZE < 0) {
+			System.err.println("ERROR: Population size must be greater than zero");
+			error = true;
+		}
+		if (TOURNAMENT_SIZE < 0) {
+			System.err.println("ERROR: Tournament size must be greater than zero");
+			error = true;
+		}
+		if (error == true) {
+			System.exit(1);
 		}
 	}
 }
