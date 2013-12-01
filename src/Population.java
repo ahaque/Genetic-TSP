@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Random;
 
 public class Population {
 	public ArrayList<Individual> individuals = new ArrayList<Individual>();
@@ -33,22 +34,38 @@ public class Population {
 	 */
 	public Population evolve() {
 		// STEP 1: Select the best fit (elitism)
+		ArrayList<Individual> sorted = new ArrayList<Individual>();
 		Population nextGenPop = new Population(numCities);
 		int populationSpaceAvailable = individuals.size();
-		if (GeneticManager.keepBestFit == true) {
-			nextGenPop.individuals.add(getBestIndividual(individuals));
-			populationSpaceAvailable -= 5;
+		
+		for (int i = 0; i < GeneticManager.POPULATION_SIZE; i++) {
+			int bestCost = Integer.MAX_VALUE;
+			int bestIndex = -1;
+			for (int j = 0; j < individuals.size(); j++) {
+				if (individuals.get(j).getCost() < bestCost) {
+					bestCost = individuals.get(j).getCost();
+					bestIndex = j;
+				}
+			}
+			sorted.add(individuals.get(bestIndex));
+			individuals.remove(bestIndex);
+		}
+		// Add "top" individuals to the next generation
+		int numElite = (int) (GeneticManager.POPULATION_SIZE * GeneticManager.ELITE_PERCENT);
+		for (int i = 0; i < numElite; i++) {
+			nextGenPop.individuals.add(sorted.get(i));
+			populationSpaceAvailable--;
 		}
 		
+		// STEP 2: Select 2 parents from population and generate children
 		while (populationSpaceAvailable > 0) {
 			// STEP 2: Create offspring given two parents (genetic crossover)
-			Individual p1 = selectParentViaTournament();
-			Individual p2 = selectParentViaTournament();
+			Individual p1 = selectParentViaTournament(sorted);
+			Individual p2 = selectParentViaTournament(sorted);
 			Individual child = crossover(p1, p2);
 			
 			// STEP 3: Add mutations
 			if (Math.random() < GeneticManager.MUTATION_RATE) {
-				
 				int index1 = (int)(Math.random()*numCities);
 				int index2 = (int)(Math.random()*numCities);
 				int storage = child.getCity(index1);
@@ -104,13 +121,21 @@ public class Population {
 		
 		return child;
 	}
-	
-	public Individual selectParentViaTournament() {
-		ArrayList<Individual> tournamentPopulation = new ArrayList<Individual>();
+
+	public Individual selectParentViaTournament(ArrayList<Individual> sorted) {
+		Random rand = new Random();
 		// Select individuals randomly from the population
+		// WITH a bias towards selecting high fitness individuals
+		if (rand.nextDouble() < GeneticManager.ELITE_PARENT_RATE) {
+			int numElite = (int) (GeneticManager.ELITE_PARENT_RATE * GeneticManager.POPULATION_SIZE);
+			return sorted.get(rand.nextInt(numElite));
+		}
+		
+		// Otherwise select a parent from the general population with a uniform distribution
+		ArrayList<Individual> tournamentPopulation = new ArrayList<Individual>();
 		for (int i = 0; i < GeneticManager.TOURNAMENT_SIZE; i++) {
-			int randIndex = (int) (Math.random()*individuals.size());
-			tournamentPopulation.add(individuals.get(randIndex));
+			int randIndex = (int) (Math.random()*sorted.size());
+			tournamentPopulation.add(sorted.get(randIndex));
 		}
 		//System.out.println("BEST: "+getBestIndividual(tournamentPopulation));
 		return getBestIndividual(tournamentPopulation);

@@ -16,19 +16,22 @@ public class GeneticManager {
 	public static boolean printNewChildren = false;
 	
 	// Genetic Algorithm Paramaters
-	public static final int POPULATION_SIZE = 200;
-	public static final int NUM_EVOLUTION_ITERATIONS = 1000;
-	// The best individual will always survive to the next population
-	public static boolean keepBestFit = true;
+	public static final int POPULATION_SIZE = 1000;
+	public static final int NUM_EVOLUTION_ITERATIONS = 10000;
+
 	// When selecting two parents, we want the "fittest" parents to reproduce
 	// This is done by randomly selecting X individuals in the population and 
 	// selecting the top two from this sub-population. The size of the sub-population is tournament size
 	// This must be less than POPULATION_SIZE
 	public static int TOURNAMENT_SIZE = 10; 
 	// The probability a specific individual undergoes a single mutation
-	public static double MUTATION_RATE = 0.05;
-	// Probability of skippnig crossover and using the best parent
-	public static double CLONE_RATE = 0.0;
+	public static double MUTATION_RATE = 0.1;
+	// Probability of skipping crossover and using the best parent
+	public static double CLONE_RATE = 0.1;
+	// Elite percent is what we define as "high" fit individuals
+	public static double ELITE_PERCENT = 0.1;
+	// When selecting parents, the ELITE_PARENT_RATE is the probability that we select an elite parent
+	public static double ELITE_PARENT_RATE = 0.4;
 	
 	
 	public static void main(String[] args) {
@@ -42,10 +45,15 @@ public class GeneticManager {
 		Population pop = new Population(numCities);
 		pop.initializePopulationRandomly(POPULATION_SIZE);
 		for (int i = 0; i < NUM_EVOLUTION_ITERATIONS; i++) {
-			System.out.println("ITERATION " + i + ". AVERAGE FITNESS: " + pop.averageFitness());
+			//System.out.println("ITERATION " + i + ". AVERAGE FITNESS: " + pop.averageFitness());
 			pop = pop.evolve();
+			if (i % 1000 == 0) {
+				System.out.println("Finished Iteration: " + i + ". Best Solution: "+pop.getBestIndividualInPop());
+			}
+			//System.out.println(pop);
 		}
-		
+		System.out.println("BEST SOLUTION:");
+		System.out.println(pop.getBestIndividualInPop());
 	}
 		
 	public GeneticManager() {
