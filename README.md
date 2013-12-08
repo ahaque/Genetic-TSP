@@ -1,4 +1,4 @@
-Genetic Algorithms for Traveling Salesperson Problem
+Genetic Algorithms for Traveling Saleman Problem
 =========
 
 In this project, I implement a genetic algorithm for the NP-hard traveling sales person problem. This returns an approximate solution. The remainder of this README is as follows:
