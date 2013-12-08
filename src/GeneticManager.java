@@ -33,6 +33,8 @@ public class GeneticManager {
 	public static double ELITE_PERCENT = 0.1;
 	// When selecting parents, the ELITE_PARENT_RATE is the probability that we select an elite parent
 	public static double ELITE_PARENT_RATE = 0.1;
+	// Forward progress epsilon (percent of first-attempt path cost)
+	public static double EPSILON = 0.02
 	
 	public static int GA_VERSION = 1;
 	
