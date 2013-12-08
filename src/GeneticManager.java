@@ -6,7 +6,7 @@ public class GeneticManager {
 	
 	// The input file is a SPACE delimited distance matrix
 	// For this implementation, the triangle inequality does not need to be satisfied
-	public static final String INPUT_FILE = "input2.txt";
+	public static final String INPUT_FILE = "input7.txt";
 	
 	// Input data
 	public static int[][] matrix;
@@ -17,7 +17,7 @@ public class GeneticManager {
 	
 	// Genetic Algorithm Paramaters
 	public static final int POPULATION_SIZE = 100;
-	public static final int NUM_EVOLUTION_ITERATIONS = 200;
+	public static final int NUM_EVOLUTION_ITERATIONS = 100;
 
 	// When selecting two parents, we want the "fittest" parents to reproduce
 	// This is done by randomly selecting X individuals in the population and 
@@ -51,7 +51,7 @@ public class GeneticManager {
 			for (int i = 0; i < NUM_EVOLUTION_ITERATIONS; i++) {
 				//System.out.println("ITERATION " + i + ". AVERAGE FITNESS: " + pop.averageFitness());
 				pop = pop.evolve();
-				if (i % 100 == 0) {
+				if (i % 3 == 0) {
 					System.out.println("Finished Iteration: " + i + ". Best Solution: "+pop.getBestIndividualInPop());
 				}
 			}
