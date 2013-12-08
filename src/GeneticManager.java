@@ -6,7 +6,7 @@ public class GeneticManager {
 	
 	// The input file is a SPACE delimited distance matrix
 	// For this implementation, the triangle inequality does not need to be satisfied
-	public static final String INPUT_FILE = "input7.txt";
+	public static final String INPUT_FILE = "input1.txt";
 	
 	// Input data
 	public static int[][] matrix;
